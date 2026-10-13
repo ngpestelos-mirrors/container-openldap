@@ -9,6 +9,19 @@ Project-specific changes only. See upstream [OpenLDAP release notes](https://www
 - Add the Postfix Book schema in both OpenLDAP `.schema` and `cn=config` `.ldif` formats.
 - Improve debug logging for file moves and schema conversion, including a check that the generated LDIF file exists.
 - Update the base image to `osixia/baseimage:alpine-2.0.0-rc3`.
+- Allow authenticated users to read `entry`, `objectClass`, `ou`, `o` and `dc` in addition to `cn`, `sn`, `givenName`, `mail` and `uid` in the default database ACL (new bootstraps only).
+- Fail bootstrap with an explicit error when `OPENLDAP_BOOTSTRAP_SUFFIX` does not start with `dc=`, instead of creating a root entry with an empty `dc`.
+- Fail bootstrap with an explicit error when `OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS` contains more than 9 hosts.
+- Check that backup files exist and are valid gzip archives before `openldap-ctl restore` stops OpenLDAP or deletes existing data.
+- Print usage when `openldap-ctl schema2ldif` is called without arguments.
+
+### Fixed
+
+- Fix downgrade detection at the `minor` and `patch` migration levels.
+- Fix `openldap-ctl password hash` for passwords containing spaces or shell special characters.
+- Fix the default database ACL so authenticated users can actually read the allowed attributes.
+- Remove bootstrap temporary files, including on failure.
+- Strip leading and trailing empty lines from every bootstrap LDIF fragment, including the first file of each prefix group.
 
 ### Documentation
 
