@@ -14,7 +14,9 @@ extract_version() {
 
 version_lt() {
     local IFS=.
-    local -a v1=("$1") v2=("$2")
+    local -a v1 v2
+    read -ra v1 <<< "$1"
+    read -ra v2 <<< "$2"
     for i in 0 1 2; do
         local a=${v1[i]:-0} b=${v2[i]:-0}
         (( 10#$a < 10#$b )) && return 0
