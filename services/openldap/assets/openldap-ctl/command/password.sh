@@ -19,10 +19,9 @@ hash() {
 
     if [ -z "${password}" ]; then
         container log fatal "Missing password argument"
-        exit 1
     fi
 
-    eval "${OPENLDAP_CTL_PASSWORD_HASH_CMD}" -s "${password}"
+    eval "${OPENLDAP_CTL_PASSWORD_HASH_CMD}"' -s "${password}"'
 }
 
 usage() {
