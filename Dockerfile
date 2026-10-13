@@ -1,4 +1,4 @@
-ARG BASE_IMAGE="osixia/baseimage:alpine-2.0.0-rc2"
+ARG BASE_IMAGE="osixia/baseimage:alpine-2.0.0-rc3"
 FROM ${BASE_IMAGE}
 
 ARG IMAGE="osixia/openldap:develop"

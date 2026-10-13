@@ -12,11 +12,11 @@ CLEAN_DAYS=""
 FILE_PREFIX=""
 
 usage() {
-    echo "Usage: file-prefix [--config] [--data] [--clean days|--clean=days]"
+    echo "Usage: openldap-ctl backup file-prefix [--config] [--data] [--clean days|--clean=days]"
 }
 
 clean() {
-    find "${OPENLDAP_BACKUP_DIR}" -type f -mtime "+$1" -print0 | xargs -0 rm -fv | container log info
+    find "${OPENLDAP_BACKUP_DIR}" -type f -mtime "+$1" -exec rm -fv {} + | container log info
 }
 
 backup_database() {
@@ -33,7 +33,7 @@ backup_database() {
         container log fatal "Failed to backup database ${db_number} to ${filename}"
     fi
 
-    mv "${tmp_file}" "${OPENLDAP_BACKUP_DIR}/${filename}"
+    mv -v "${tmp_file}" "${OPENLDAP_BACKUP_DIR}/${filename}" 2>&1 | container log debug
 
     trap - RETURN
 }
@@ -51,6 +51,7 @@ while [ $# -gt 0 ]; do
       --clean)
           if [ $# -lt 2 ]; then
               usage
+              container log fatal "Missing value for --clean"
           fi
           CLEAN_DAYS="$2"
           shift 2
@@ -78,6 +79,11 @@ done
 if [ -z "${FILE_PREFIX}" ]; then
     usage
     container log fatal "Missing file-prefix"
+fi
+
+if [ -n "${CLEAN_DAYS}" ] && [[ ! "${CLEAN_DAYS}" =~ ^[0-9]+$ ]]; then
+    usage
+    container log fatal "--clean must be a non-negative number of days"
 fi
 
 if [ "${CONFIG}" = false ] && [ "${DATA}" = false ]; then

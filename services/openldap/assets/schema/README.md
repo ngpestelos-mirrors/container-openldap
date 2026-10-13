@@ -20,6 +20,19 @@ Adds OpenSSH public key attributes (for example `sshPublicKey`) to publish SSH k
 
 https://github.com/AndriiGrytsenko/openssh-ldap-publickey/blob/master/misc/openssh-lpk-openldap.schema
 
+## postfix-book
+
+Postfix Book schema used by docker-mailserver LDAP provisioning. It defines
+`PostfixBookMailAccount`, `PostfixBookMailForward`, `mailEnabled`,
+`mailAlias` and `mailGroupMember`.
+
+Both the traditional OpenLDAP `.schema` format and the `cn=config` `.ldif`
+format are provided. Do not load this schema together with `virtualMail`: they
+define several attributes with the same names but different OIDs.
+
+Source:
+https://github.com/docker-mailserver/docker-mailserver/blob/master/test/config/ldap/openldap/schemas/postfix-book.ldif
+
 ## rfc2307bis
 
 Extended RFC2307/NIS-style schema for UNIX account/group integration, including better group/member modeling.
@@ -49,5 +62,8 @@ https://github.com/wheelybird/ldap-totp-schema/blob/main/totp-schema.ldif
 ## virtualMail
 
 Mail-oriented schema for virtual mailbox deployments (mail accounts, aliases, delivery metadata).
+
+Do not load this schema together with `postfix-book`: they define several
+attributes with the same names but different OIDs.
 
 https://github.com/tleuxner/ldap-virtualMail/blob/master/schema.txt

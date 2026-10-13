@@ -2,6 +2,20 @@
 
 Project-specific changes only. See upstream [OpenLDAP release notes](https://www.openldap.org/software/release/changes_lts.html).
 
+## 2.6.15-beta
+
+### Changed
+
+- Add the Postfix Book schema in both OpenLDAP `.schema` and `cn=config` `.ldif` formats.
+- Improve debug logging for file moves and schema conversion, including a check that the generated LDIF file exists.
+- Update the base image to `osixia/baseimage:alpine-2.0.0-rc3`.
+
+### Documentation
+
+- Document the Postfix Book schema and its incompatibility with the `virtualMail` schema.
+- Improve the schema conversion example for local files and non-root execution.
+
+
 ## 2.6.15-alpha
 
 ### Changed

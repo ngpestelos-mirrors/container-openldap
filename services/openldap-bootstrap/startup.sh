@@ -78,7 +78,7 @@ bootstrap_ldif() {
             }
             ' "${file}" > "${tmp}"
 
-            mv "${tmp}" "${file}"
+            mv -v "${tmp}" "${file}" 2>&1 | container log debug
         fi
 
         cat "${file}" >> "${tmp_file}"

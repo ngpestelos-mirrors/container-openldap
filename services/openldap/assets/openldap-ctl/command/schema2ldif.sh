@@ -49,9 +49,13 @@ for schema in ${SCHEMAS} ; do
       container log fatal "${schema_name} ldif file already exists: ${ldif}"
     fi
 
-    find "${TMP_DIR}" | container log debug
+    find "${TMP_DIR}" 2>&1 | container log debug
 
-    find "${TMP_DIR}" -name "*\}${schema_name,,}.ldif" -exec mv '{}' "${ldif}" \;
+    find "${TMP_DIR}" -name "*\}${schema_name,,}.ldif" -exec mv -v '{}' "${ldif}" \; 2>&1 | container log debug
+
+    if [ ! -e "${ldif}" ]; then
+      container log fatal "failed creating ${ldif}"
+    fi
 
     sed -i "s/^dn:.*/dn: cn=${schema_name},cn=schema,cn=config/g" "${ldif}"
     sed -i "s/^cn:.*/cn: ${schema_name}/g" "${ldif}"

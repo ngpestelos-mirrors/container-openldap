@@ -13,7 +13,7 @@ RESTART=false
 FILE_PREFIX=""
 
 usage() {
-    echo "Usage: file-prefix [--config] [--data]"
+    echo "Usage: openldap-ctl restore file-prefix [--config] [--data] [--force]"
 }
 
 restore_database() {

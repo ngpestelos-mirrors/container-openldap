@@ -7,7 +7,7 @@ generate_password() {
 }
 
 hash_password() {
-    if [ -z "$1" ]; then
+    if [ "$#" -ne 1 ] || [ -z "$1" ]; then
         container log fatal "password to hash required"
     fi
     openldap-ctl password hash "$1"

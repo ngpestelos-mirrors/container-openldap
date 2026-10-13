@@ -13,7 +13,7 @@ func main() {
 	// image
 
 	var OpenLDAPImage = &config.Image{
-		BaseImage:    "osixia/baseimage:alpine-2.0.0-rc2",
+		BaseImage:    "osixia/baseimage:alpine-2.0.0-rc3",
 		Distribution: config.Alpine,
 
 		Name:        "osixia/openldap",

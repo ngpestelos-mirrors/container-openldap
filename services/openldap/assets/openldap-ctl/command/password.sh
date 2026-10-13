@@ -11,6 +11,10 @@ generate() {
 }
 
 hash() {
+    if [ "$#" -ne 1 ]; then
+        container log fatal "Exactly one password argument is required"
+    fi
+
     local password="$1"
 
     if [ -z "${password}" ]; then
@@ -28,7 +32,7 @@ usage() {
 }
 
 main() {
-    local cmd="$1"
+    local cmd="${1:-}"
 
     case "$cmd" in
         generate)

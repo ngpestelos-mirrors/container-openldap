@@ -8,7 +8,7 @@ extract_version() {
         patch) echo "${version}" | grep -oE '^[0-9]+\.[0-9]+\.[0-9]+' ;;
         minor) echo "${version}" | grep -oE '^[0-9]+\.[0-9]+' ;;
         major) echo "${version}" | grep -oE '^[0-9]+' ;;
-        *) container log fatal "Unknow OPENLDAP_UPGRADE_MIGRATION_LEVEL: ${OPENLDAP_UPGRADE_MIGRATION_LEVEL}. Must be patch, minor or major" ;;
+        *) container log fatal "Unknown OPENLDAP_UPGRADE_MIGRATION_LEVEL: ${OPENLDAP_UPGRADE_MIGRATION_LEVEL}. Must be patch, minor or major" ;;
     esac
 }
 

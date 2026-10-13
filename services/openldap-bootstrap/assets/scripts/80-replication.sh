@@ -41,7 +41,7 @@ if [ "${OPENLDAP_BOOTSTRAP_REPLICATION}" = "true" ]; then
         done
 
         if [ "${i}" -lt 3 ]; then
-            container log fatal "OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS must contain at leat 2 hosts, got $((i - 1)) (${OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS})"
+            container log fatal "OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS must contain at least 2 hosts, got $((i - 1)) (${OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS})"
         fi
 
         if [ "${current_host_id}" -eq 0 ]; then

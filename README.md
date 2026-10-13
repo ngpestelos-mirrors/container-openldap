@@ -305,7 +305,7 @@ docker run --rm osixia/openldap run -- openldap-ctl password hash passw0rd
 ### Convert Schema to LDIF
 
 ``` bash
-docker run --rm -v schema:/data \
+docker run --rm --user $UID -v $(pwd)/schema:/data   \
   osixia/openldap run -- openldap-ctl schema2ldif /data/test.schema
 ```
 
