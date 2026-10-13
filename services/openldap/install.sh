@@ -12,7 +12,7 @@ chown ldap:ldap -R /container
 container log info "Copy OpenLDAP container modules to /usr/lib/openldap ..."
 cp -frav /container/services/openldap/assets/module/. /usr/lib/openldap 2>&1 | container log debug
 
-container log info "Copy OpenLDAP container schemas to ..."
+container log info "Copy OpenLDAP container schemas to /etc/openldap/schema ..."
 cp -frav /container/services/openldap/assets/schema/. /etc/openldap/schema 2>&1 | container log debug
 
 container log info "Creating default config directory /etc/openldap/slapd.d ..."
