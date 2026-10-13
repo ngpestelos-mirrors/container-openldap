@@ -6,6 +6,15 @@ set -euo pipefail
 # print commands and their arguments as they are executed
 container log level eq trace && set -x
 
+usage() {
+    echo "Usage: openldap-ctl schema2ldif \"schema-files\" [\"dependencies\"]"
+}
+
+if [ "$#" -lt 1 ]; then
+    usage
+    container log fatal "Missing schema files"
+fi
+
 SCHEMAS=$1
 DEPENDENCIES=${2:-${OPENLDAP_CTL_SCHEMA2LDIF_DEPENDENCIES}}
 
@@ -36,7 +45,7 @@ for schema in ${SCHEMAS} ; do
 done
 
 if ! slaptest -f "${TMP_FILE}" -F "${TMP_DIR}" > /dev/null ; then
-    container log fatal "Failed do convert ${SCHEMAS} to ldif"
+    container log fatal "Failed to convert ${SCHEMAS} to ldif"
 fi
 
 for schema in ${SCHEMAS} ; do
