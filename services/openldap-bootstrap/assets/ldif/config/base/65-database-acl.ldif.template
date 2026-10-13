@@ -5,7 +5,7 @@ olcAccess: to attrs=userPassword,shadowLastChange
   by self write
   by anonymous auth
   by * break
-olcAccess: to attrs=cn,sn,givenName,mail,uid
+olcAccess: to attrs=entry,objectClass,cn,sn,givenName,mail,uid,ou,o,dc
   by self read
   by users read
   by * break
