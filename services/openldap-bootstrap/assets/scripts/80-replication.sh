@@ -44,6 +44,10 @@ if [ "${OPENLDAP_BOOTSTRAP_REPLICATION}" = "true" ]; then
             container log fatal "OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS must contain at least 2 hosts, got $((i - 1)) (${OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS})"
         fi
 
+        if [ "${i}" -gt 10 ]; then
+            container log fatal "OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS must contain at most 9 hosts, got $((i - 1))"
+        fi
+
         if [ "${current_host_id}" -eq 0 ]; then
             container log fatal "Current host ${current_fqdn} not found in OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS=${OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS}"
         fi
