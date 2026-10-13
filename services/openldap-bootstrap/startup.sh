@@ -16,11 +16,13 @@ fi
 
 container log info "Bootstrapping OpenLDAP ..."
 
+BOOTSTRAP_TMP_DIR="$(mktemp -d)"
+trap 'rm -rf "${BOOTSTRAP_TMP_DIR}"' EXIT
+
 bootstrap_env() {
     local tmp_file
 
-    tmp_file="$(mktemp)"
-    trap 'rm -f "${tmp_file}"' RETURN
+    tmp_file="$(mktemp -p "${BOOTSTRAP_TMP_DIR}")"
 
     for script in "${OPENLDAP_BOOTSTRAP_SCRIPTS_DIR}"/*.sh; do
         "${script}" "env" "${tmp_file}"
@@ -38,8 +40,7 @@ bootstrap_ldif() {
     local tmp_dir
     local tmp
 
-    tmp_dir=$(mktemp -d)
-    trap 'rm -rf "${tmp_dir:-}"; rm -f "${tmp:-}"' RETURN
+    tmp_dir=$(mktemp -d -p "${BOOTSTRAP_TMP_DIR}")
 
     for script in "${OPENLDAP_BOOTSTRAP_SCRIPTS_DIR}"/*.sh; do
         "${script}" "ldif" "${source_dir}" "${tmp_dir}"
@@ -66,7 +67,7 @@ bootstrap_ldif() {
             echo >> "${tmp_file}" # add empty line
         else
             # remove trailing empty lines
-            tmp=$(mktemp)
+            tmp=$(mktemp -p "${BOOTSTRAP_TMP_DIR}")
             awk '
             { lines[NR] = $0 }
             $0 ~ /[^[:space:]]/ {
@@ -93,8 +94,7 @@ bootstrap_database() {
     local db_number="$2"
     local tmp_file
 
-    tmp_file="$(mktemp)"
-    trap 'rm -f "${tmp_file}"' RETURN
+    tmp_file="$(mktemp -p "${BOOTSTRAP_TMP_DIR}")"
 
     bootstrap_ldif "${source_dir}" "${tmp_file}"
 
