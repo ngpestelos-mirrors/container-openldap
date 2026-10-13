@@ -59,6 +59,7 @@ Notes:
 - Default internal listener ports are `3890` (LDAP) and `6360` (LDAPS), as defined by `OPENLDAP_URLS`.
 - On first start, passwords are generated if hashed values are empty and printed in logs.
 - Bootstrap runs only when config/data are empty.
+- `OPENLDAP_BOOTSTRAP_SUFFIX` must start with `dc=` (for example `dc=example,dc=org`).
 
 **Verify the server is up**
 
@@ -146,7 +147,7 @@ Restore a backup:
 docker exec openldap container run -- openldap-ctl restore my-backup --force
 ```
 
-`--force` stops the OpenLDAP process if needed, deletes existing data in the target directories, restores the selected databases, then starts OpenLDAP again.
+`--force` stops the OpenLDAP process if needed, deletes existing data in the target directories, restores the selected databases, then starts OpenLDAP again. Backup files are checked first: if one is missing or corrupted, nothing is stopped or deleted.
 
 The cron service is disabled by default. To schedule regular backups, run it in a separate container alongside OpenLDAP, sharing its configuration, data, and backup volumes:
 
@@ -186,7 +187,7 @@ If you also set `OPENLDAP_BOOTSTRAP_TLS_REQUIRED=true`, bootstrap adds TLS-requi
 
 Set `OPENLDAP_BOOTSTRAP_REPLICATION=true` to bootstrap syncrepl replication.
 
-`OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS` must contain at least two hosts, in the same order on every server. The current node FQDN must match one of them.
+`OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS` must contain between two and nine hosts, in the same order on every server. The current node FQDN must match one of them.
 
 When replication is enabled, set `OPENLDAP_URLS` with the node hostname in LDAP/LDAPS URLs (for example `ldap://ldap1.example.org:3890 ldaps://ldap1.example.org:6360 ldapi:///`) so advertised endpoints match replication hosts.
 
@@ -322,7 +323,7 @@ docker run --rm --user $UID -v $(pwd)/schema:/data   \
 | `OPENLDAP_SCHEMAS_DIR`        | Directory containing LDIF schemas loaded at bootstrap | `/etc/openldap/schema`                       |
 | `OPENLDAP_CUSTOM_MODULES_DIR` | Custom modules copied at startup                      | `/container/services/openldap/assets/module` |
 | `OPENLDAP_CUSTOM_SCHEMAS_DIR` | Custom schemas copied at startup                      | `/container/services/openldap/assets/schema` |
-| `OPENLDAP_NOFILE`             | `ulimit -n` value before starting `slapd`             | `65536`                                      |
+| `OPENLDAP_NOFILE`             | `ulimit -n` value before starting `slapd`             | `8192`                                       |
 | `OPENLDAP_DEBUG_LEVEL`        | Default `slapd` debug level                           | `256`                                        |
 | `OPENLDAP_URLS`               | Listener URLs passed to `slapd -h`                    | `ldap://:3890 ldaps://:6360 ldapi:///`      |
 
@@ -331,8 +332,8 @@ docker run --rm --user $UID -v $(pwd)/schema:/data   \
 | Variable                                              | Description                                                                       | Default                                                     |
 | ----------------------------------------------------- | --------------------------------------------------------------------------------- | ----------------------------------------------------------- |
 | `OPENLDAP_BOOTSTRAP_ORGANIZATION`                     | Organization name used in bootstrap data                                          | `Example Org`                                               |
-| `OPENLDAP_BOOTSTRAP_SUFFIX`                           | Base LDAP suffix                                                                  | `dc=example,dc=org`                                         |
-| `OPENLDAP_BOOTSTRAP_MODULES`                          | OpenLDAP modules loaded during bootstrap                                          | `back_mdb.so argon2.so refint.so ppolicy.so unique.so memberof.so syncprov.so` |
+| `OPENLDAP_BOOTSTRAP_SUFFIX`                           | Base LDAP suffix; must start with `dc=`                                           | `dc=example,dc=org`                                         |
+| `OPENLDAP_BOOTSTRAP_MODULES`                          | OpenLDAP modules loaded during bootstrap                                          | `back_mdb.so argon2.so ppolicy.so unique.so refint.so memberof.so syncprov.so` |
 | `OPENLDAP_BOOTSTRAP_SCHEMAS`                          | LDIF schemas imported during bootstrap                                            | `core.ldif cosine.ldif inetorgperson.ldif rfc2307bis.ldif`  |
 | `OPENLDAP_BOOTSTRAP_GLOBAL_SIZE_LIMIT`                         | Global LDAP size limit                                                            | `500`                                                       |
 | `OPENLDAP_BOOTSTRAP_GLOBAL_TIME_LIMIT`                         | Global LDAP time limit                                                            | `120`                                                       |
@@ -381,7 +382,7 @@ docker run --rm --user $UID -v $(pwd)/schema:/data   \
 | `OPENLDAP_BOOTSTRAP_PPOLICY_HASH_CLEAR_TEXT`                | Value for `olcPPolicyHashCleartext`                     | `true`                                             |
 | `OPENLDAP_BOOTSTRAP_PPOLICY_USE_LOCKOUT`                    | Value for `olcPPolicyUseLockout`                        | `true`                                             |
 | `OPENLDAP_BOOTSTRAP_PPOLICY_CHECK_MODULE`                   | Optional value for `olcPPolicyCheckModule`              | ``                                                 |
-| `OPENLDAP_BOOTSTRAP_PPOLICY_GROUP_DN`                       | DN of the policy container created in the main database | `ou=Policies,${OPENLDAP_BOOTSTRAP_SUFFIX}`         |
+| `OPENLDAP_BOOTSTRAP_PPOLICY_GROUP_DN`                       | DN of the policy container created in the main database | `ou=policies,${OPENLDAP_BOOTSTRAP_SUFFIX}`         |
 | `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_POLICY_DN`              | DN of the default password policy                       | `cn=default,${OPENLDAP_BOOTSTRAP_PPOLICY_GROUP_DN}` |
 | `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MIN_LENGTH`             | Value for `pwdMinLength`                                | `12`                                               |
 | `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_CHECK_QUALITY`          | Value for `pwdCheckQuality`                             | `0`                                                |
@@ -421,9 +422,9 @@ docker run --rm --user $UID -v $(pwd)/schema:/data   \
 | Variable                                                   | Description                                                                | Default                                                               |
 | ---------------------------------------------------------- | -------------------------------------------------------------------------- | --------------------------------------------------------------------- |
 | `OPENLDAP_BOOTSTRAP_REPLICATION`                           | Enable replication bootstrap                                               | `false`                                                               |
-| `OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS`                     | Replication endpoints list; at least two, same order on every server       | `ldap://ldap1.example.org:3890 ldap://ldap2.example.org:3890`         |
+| `OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS`                     | Replication endpoints list; two to nine, same order on every server        | `ldap://ldap1.example.org:3890 ldap://ldap2.example.org:3890`         |
 | `OPENLDAP_BOOTSTRAP_REPLICATION_SYNCPROV_CHECKPOINT`       | `syncprov` checkpoint configuration                                        | `100 10`                                                              |
-| `OPENLDAP_BOOTSTRAP_REPLICATION_DATA_READONLY_DN`          | Replication account DN for the main database                               | `cn=data-replicator,${OPENLDAP_BOOTSTRAP_SUFFIX}`                     |
+| `OPENLDAP_BOOTSTRAP_REPLICATION_DATA_READONLY_DN`          | Replication account DN for the main database                               | `cn=replicator,${OPENLDAP_BOOTSTRAP_SUFFIX}`                          |
 | `OPENLDAP_BOOTSTRAP_REPLICATION_DATA_READONLY_PASSWORD`    | Plain password for the data replication account; generated if empty        | ``                                                                    |
 | `OPENLDAP_BOOTSTRAP_REPLICATION_DATA_SYNC_REPL_TEMPLATE`   | Template used to generate data `olcSyncRepl`                               | `rid=\${OPENLDAP_BOOTSTRAP_REPLICATION_DATA_SYNC_REPL_RID} ...`       |
 | `OPENLDAP_BOOTSTRAP_REPLICATION_DATA_LIMITS`               | Limits ACL for the data replication account                                | `dn.exact="${OPENLDAP_BOOTSTRAP_REPLICATION_DATA_READONLY_DN}" ...`   |

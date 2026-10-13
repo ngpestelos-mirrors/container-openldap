@@ -37,6 +37,7 @@ During bootstrap, files are also grouped by **tens** based on their numeric pref
 
 - Files in the **same ten-group** (for example `40-*` and `49-*`) are concatenated **without a blank line** between them.
 - When switching to a **different ten-group** (for example `49-*` to `50-*`), bootstrap inserts **one blank line**.
+- Leading and trailing empty lines are removed from every file before it is concatenated.
 
 This matters because, in LDIF parsing, a blank line separates records:
 
@@ -64,7 +65,7 @@ Core OpenLDAP configuration applied on every bootstrap. Files are numbered to co
 | `50-config.ldif.template` | Config database (`olcDatabase=config`) with root DN and credentials |
 | `59-config-acl-close.ldif` | Closes config ACLs (deny all) |
 | `60-database.ldif.template` | Main data database (MDB backend) with indexes |
-| `65-database-acl.ldif.template` | Data database ACLs (user self-service, attribute access) |
+| `65-database-acl.ldif.template` | Data database ACLs (password self-service, basic attributes readable by authenticated users) |
 | `69-database-acl-close.ldif` | Closes data ACLs (deny all) |
 | `70-monitor.ldif.template` | Monitor database configuration |
 | `75-monitor-acl.ldif.template` | Monitor database ACLs |

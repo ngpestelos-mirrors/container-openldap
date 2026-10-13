@@ -20,7 +20,7 @@ Scripts are executed in numeric order. Most are feature-gated by an environment 
 | `50-ppolicy.sh` | `OPENLDAP_BOOTSTRAP_PPOLICY=true` | Configures the password policy overlay and default policy entry |
 | `60-unique.sh` | `OPENLDAP_BOOTSTRAP_UNIQUE=true` | Configures the unique attributes overlay |
 | `70-memberof.sh` | `OPENLDAP_BOOTSTRAP_MEMBEROF=true` | Configures the memberof overlay |
-| `80-replication.sh` | `OPENLDAP_BOOTSTRAP_REPLICATION=true` | Sets up multi-provider syncrepl replication (requires ≥ 2 hosts) |
+| `80-replication.sh` | `OPENLDAP_BOOTSTRAP_REPLICATION=true` | Sets up multi-provider syncrepl replication (requires 2 to 9 hosts) |
 | `90-custom.sh` | always | Applies user-provided custom LDIF files from the `custom/` directories |
 
 ## Helpers
