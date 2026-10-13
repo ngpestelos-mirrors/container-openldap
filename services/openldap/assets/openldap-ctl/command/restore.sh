@@ -16,10 +16,21 @@ usage() {
     echo "Usage: openldap-ctl restore file-prefix [--config] [--data] [--force]"
 }
 
+check_backup_file() {
+    local backup_file="$1"
+
+    if [ ! -f "${backup_file}" ]; then
+        container log fatal "Backup file not found: ${backup_file}"
+    fi
+
+    if ! gzip -t "${backup_file}" 2>/dev/null; then
+        container log fatal "Backup file is corrupted: ${backup_file}"
+    fi
+}
+
 restore_database() {
-    local filename="$1"
+    local backup_file="$1"
     local db_number="$2"
-    local backup_file="${OPENLDAP_BACKUP_DIR}/${filename}"
 
     if [ ! -f "${backup_file}" ]; then
         container log fatal "Backup file not found: ${backup_file}"
@@ -72,6 +83,17 @@ if [ "${CONFIG}" = false ] && [ "${DATA}" = false ]; then
     DATA=true
 fi
 
+CONFIG_BACKUP_FILE="${OPENLDAP_BACKUP_DIR}/${FILE_PREFIX}${OPENLDAP_CTL_BACKUP_CONFIG_FILE_SUFFIX}"
+DATA_BACKUP_FILE="${OPENLDAP_BACKUP_DIR}/${FILE_PREFIX}${OPENLDAP_CTL_BACKUP_DATA_FILE_SUFFIX}"
+
+if [ "${CONFIG}" = true ]; then
+    check_backup_file "${CONFIG_BACKUP_FILE}"
+fi
+
+if [ "${DATA}" = true ]; then
+    check_backup_file "${DATA_BACKUP_FILE}"
+fi
+
 if [ -e "/run/container/processes/openldap.pid" ]; then
 
     if [ "${FORCE}" != true ]; then
@@ -101,7 +123,7 @@ if [ "${CONFIG}" = true ]; then
     fi
 
     container log info "Restoring OpenLDAP config ..."
-    restore_database "${FILE_PREFIX}${OPENLDAP_CTL_BACKUP_CONFIG_FILE_SUFFIX}" 0
+    restore_database "${CONFIG_BACKUP_FILE}" 0
 fi
 
 if [ "${DATA}" = true ]; then
@@ -112,7 +134,7 @@ if [ "${DATA}" = true ]; then
     fi
 
     container log info "Restoring OpenLDAP data ..."
-    restore_database "${FILE_PREFIX}${OPENLDAP_CTL_BACKUP_DATA_FILE_SUFFIX}" 1
+    restore_database "${DATA_BACKUP_FILE}" 1
 fi
 
 if [ "${RESTART}" = true ]; then
