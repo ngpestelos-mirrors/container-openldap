@@ -65,22 +65,22 @@ bootstrap_ldif() {
         # add a blank line between each group (e.g., between 49 and 50).
         if [ -n "${prev_group}" ] && [ "${group}" != "${prev_group}" ]; then
             echo >> "${tmp_file}" # add empty line
-        else
-            # remove trailing empty lines
-            tmp=$(mktemp -p "${BOOTSTRAP_TMP_DIR}")
-            awk '
-            { lines[NR] = $0 }
-            $0 ~ /[^[:space:]]/ {
-                if (!first) first = NR
-                last = NR
-            }
-            END {
-                if (first) for (i = first; i <= last; i++) print lines[i]
-            }
-            ' "${file}" > "${tmp}"
-
-            mv -v "${tmp}" "${file}" 2>&1 | container log debug
         fi
+
+        # remove leading and trailing empty lines
+        tmp=$(mktemp -p "${BOOTSTRAP_TMP_DIR}")
+        awk '
+        { lines[NR] = $0 }
+        $0 ~ /[^[:space:]]/ {
+            if (!first) first = NR
+            last = NR
+        }
+        END {
+            if (first) for (i = first; i <= last; i++) print lines[i]
+        }
+        ' "${file}" > "${tmp}"
+
+        mv -v "${tmp}" "${file}" 2>&1 | container log debug
 
         cat "${file}" >> "${tmp_file}"
 
