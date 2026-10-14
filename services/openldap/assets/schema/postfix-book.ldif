@@ -1,5 +1,5 @@
 # AUTO-GENERATED FILE - DO NOT EDIT!! Use ldapmodify.
-# CRC32 773d0ecf
+# CRC32 d043ad73
 dn: cn=postfix-book,cn=schema,cn=config
 objectClass: olcSchemaConfig
 cn: postfix-book
@@ -25,7 +25,7 @@ olcAttributeTypes: {6}( 1.3.6.1.4.1.29426.1.10.7 NAME 'mailQuota' DESC 'Mail q
  uota limit in kilobytes' EQUALITY caseExactIA5Match SYNTAX 1.3.6.1.4.1.1466.1
  15.121.1.26 )
 olcAttributeTypes: {7}( 1.3.6.1.4.1.29426.1.10.8 NAME 'mailStorageDirectory' D
- ESC 'The absolute path to the mail users mailbox' EQUALITY caseExactIA5Match
+ ESC 'The absolute path to the mail users mailbox' EQUALITY caseExactIA5Match 
  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
 olcObjectClasses: {0}( 1.3.6.1.4.1.29426.1.2.2.1 NAME 'PostfixBookMailAccount'
   DESC 'Mail account used in Postfix Book' SUP top AUXILIARY MUST mail MAY ( m
