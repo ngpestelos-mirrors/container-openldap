@@ -1,0 +1,6 @@
+root = true
+
+# Generated cn=config schemas: trailing spaces before a folded line are
+# significant in LDIF (the continuation's leading space is dropped).
+[services/openldap/assets/schema/*.ldif]
+trim_trailing_whitespace = false
