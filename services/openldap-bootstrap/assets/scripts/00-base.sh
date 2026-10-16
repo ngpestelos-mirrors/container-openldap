@@ -29,8 +29,14 @@ if [ "${TYPE}" = "env" ]; then
         OPENLDAP_BOOTSTRAP_MODULES_LDIF+="olcModuleload: ${module}"$'\n'
     done
 
+    # schemas are included by path instead of by content: large schemas (e.g. msuser.ldif)
+    # exceed the kernel size limit of a single environment variable and make every
+    # following command fail with "Argument list too long"
     for schema in ${OPENLDAP_BOOTSTRAP_SCHEMAS}; do
-        OPENLDAP_BOOTSTRAP_SCHEMAS_LDIF+="$(cat "${OPENLDAP_SCHEMAS_DIR}/${schema}")"$'\n\n'
+        if [ ! -f "${OPENLDAP_SCHEMAS_DIR}/${schema}" ]; then
+            container log fatal "Schema ${schema} not found in ${OPENLDAP_SCHEMAS_DIR}"
+        fi
+        OPENLDAP_BOOTSTRAP_SCHEMAS_LDIF+="include: file://${OPENLDAP_SCHEMAS_DIR}/${schema}"$'\n'
     done
 
     OPENLDAP_BOOTSTRAP_MONITOR_ENABLED=${OPENLDAP_BOOTSTRAP_MONITOR_ENABLED^^}

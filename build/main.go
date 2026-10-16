@@ -4,8 +4,12 @@ import (
 	"context"
 	"os"
 
-	"github.com/osixia/container-baseimage/build/cmd"
-	"github.com/osixia/container-baseimage/build/config"
+	"dagger.io/dagger"
+
+	"github.com/osixia/container-openldap/build/tests"
+	"github.com/osixia/dagger-build/cmd"
+	"github.com/osixia/dagger-build/config"
+	"github.com/osixia/dagger-build/job"
 )
 
 func main() {
@@ -13,7 +17,7 @@ func main() {
 	// image
 
 	var OpenLDAPImage = &config.Image{
-		BaseImage:    "osixia/baseimage:alpine-2.0.0-rc3",
+		BaseImage:    "osixia/baseimage:alpine-2.0.0",
 		Distribution: config.Alpine,
 
 		Name:        "osixia/openldap",
@@ -40,6 +44,19 @@ func main() {
 	config.ProjectGithubRepo = &config.GithubRepo{
 		Organization: "osixia",
 		Project:      "container-openldap",
+	}
+
+	// tests
+
+	job.Test = func(ctx context.Context, client *dagger.Client, options any) ([]*job.BuildResult, error) {
+		builds, err := job.DefaultTest(ctx, client, options)
+		if err != nil {
+			return nil, err
+		}
+		if err := tests.Run(ctx, client, builds); err != nil {
+			return nil, err
+		}
+		return builds, nil
 	}
 
 	// execute cmd

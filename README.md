@@ -385,7 +385,7 @@ docker run --rm --user $UID -v $(pwd)/schema:/data   \
 | `OPENLDAP_BOOTSTRAP_PPOLICY_GROUP_DN`                       | DN of the policy container created in the main database | `ou=policies,${OPENLDAP_BOOTSTRAP_SUFFIX}`         |
 | `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_POLICY_DN`              | DN of the default password policy                       | `cn=default,${OPENLDAP_BOOTSTRAP_PPOLICY_GROUP_DN}` |
 | `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MIN_LENGTH`             | Value for `pwdMinLength`                                | `12`                                               |
-| `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_CHECK_QUALITY`          | Value for `pwdCheckQuality`                             | `0`                                                |
+| `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_CHECK_QUALITY`          | Value for `pwdCheckQuality`                             | `1`                                                |
 | `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_IN_HISTORY`             | Value for `pwdInHistory`                                | `12`                                               |
 | `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_ALLOW_USER_CHANGE`      | Value for `pwdAllowUserChange`                          | `true`                                             |
 | `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_SAFE_MODIFY`            | Value for `pwdSafeModify`                               | `true`                                             |

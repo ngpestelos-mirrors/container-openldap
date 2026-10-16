@@ -1,15 +1,18 @@
 module github.com/osixia/container-openldap/build
 
-go 1.25.0
-
-require github.com/osixia/container-baseimage/build v0.0.0-20261007183720-dc9d7714269f
+go 1.26.9
 
 require (
-	dagger.io/dagger v0.20.6 // indirect
+	dagger.io/dagger v0.21.10
+	github.com/osixia/dagger-build v0.0.0-20261015194426-55e8bdd25dbb
+)
+
+require (
 	github.com/99designs/gqlgen v0.17.90 // indirect
 	github.com/Khan/genqlient v0.8.1 // indirect
 	github.com/adrg/xdg v0.5.3 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
+	github.com/dagger/querybuilder v0.0.0-20260402040506-574a5e81cb59 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/go-github/v69 v69.2.0 // indirect

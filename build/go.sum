@@ -1,5 +1,5 @@
-dagger.io/dagger v0.20.6 h1:Uac8tdqieoq+psVe5f+rhNk1sk2W8YK5t4OzpGyHuTI=
-dagger.io/dagger v0.20.6/go.mod h1:ZXg8+pQZaZUC8rAw4V/gPP8aKvKARIJZ+pfcV+RC1es=
+dagger.io/dagger v0.21.10 h1:TNg1nvHZWOIt5JkTZjfF4SCGW/Y31y1qeUq6vKQ/NXU=
+dagger.io/dagger v0.21.10/go.mod h1:8hztpM9rKNjSmOa2nzd8ot6aw1RZFDWCawMfc5V9tXA=
 github.com/99designs/gqlgen v0.17.90 h1:wSv6blm/PoplU6QoNw83EcQpNtC0HX3/+44vITJOzpk=
 github.com/99designs/gqlgen v0.17.90/go.mod h1:GqYrEwYsqCG8VaOsq2kJUCUKwAE1T+u2i+Nj7NtXiVI=
 github.com/Khan/genqlient v0.8.1 h1:wtOCc8N9rNynRLXN3k3CnfzheCUNKBcvXmVv5zt6WCs=
@@ -13,6 +13,8 @@ github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883/go.mod h1:rCTlJbsFo
 github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=
 github.com/cespare/xxhash/v2 v2.3.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/cpuguy83/go-md2man/v2 v2.0.6/go.mod h1:oOW0eioCTA6cOiMLiUPZOpcVxMig6NIQQ7OS05n1F4g=
+github.com/dagger/querybuilder v0.0.0-20260402040506-574a5e81cb59 h1:g6vfdGRyz6fAjfHz5FyYPZgHy8qcQ31fHrBl1iCOzxw=
+github.com/dagger/querybuilder v0.0.0-20260402040506-574a5e81cb59/go.mod h1:jsdUJeYzcbyK1j/EqMGPrQgNYxl/Zfg06vvM9C/xXxs=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-logr/logr v1.2.2/go.mod h1:jdQByPbusPIv2/zmleS9BjJVeZ6kBagPoEUsqbVz/1A=
@@ -35,8 +37,8 @@ github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
 github.com/mitchellh/go-homedir v1.1.0 h1:lukF9ziXFxDFPkA1vsr5zpc1XuPDn/wFntq5mG+4E0Y=
 github.com/mitchellh/go-homedir v1.1.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrkLzIz1N1q0pr0=
-github.com/osixia/container-baseimage/build v0.0.0-20261007183720-dc9d7714269f h1:nxKAccHKyXoa5Sj15DVK+yEiuhN006YulVNAqP35L20=
-github.com/osixia/container-baseimage/build v0.0.0-20261007183720-dc9d7714269f/go.mod h1:gLTe03yDFd9kIL22dHdPad6G0f/u/NI+VB4+3cOHQbY=
+github.com/osixia/dagger-build v0.0.0-20261015194426-55e8bdd25dbb h1:V8FLn00GbtrHvOTII63DaCSZDoi2zQvmIztr20FmOw4=
+github.com/osixia/dagger-build v0.0.0-20261015194426-55e8bdd25dbb/go.mod h1:gxxc7tVjlUVYPeBpDBdWs1MFHuP48AR6zes7F1NIMKI=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=

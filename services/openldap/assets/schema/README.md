@@ -2,6 +2,19 @@
 
 This directory contains optional schemas that can be loaded during bootstrap with `OPENLDAP_BOOTSTRAP_SCHEMAS`.
 
+## Available schemas
+
+All schemas are copied to `/etc/openldap/schema`:
+
+- OpenLDAP (Alpine package): `collective.ldif`, `corba.ldif`, `core.ldif`, `cosine.ldif`, `dsee.ldif`, `duaconf.ldif`, `dyngroup.ldif`, `inetorgperson.ldif`, `java.ldif`, `misc.ldif`, `msuser.ldif`, `namedobject.ldif`, `nis.ldif`, `openldap.ldif`, `pmi.ldif`
+- this directory: `eduperson.ldif`, `kerberos.ldif`, `openssh-lpk.ldif`, `postfix-book.ldif`, `rfc2307bis.ldif`, `samba.ldif`, `sudo.ldif`, `totp.ldif`, `virtualMail.ldif`
+
+Incompatibilities, all other schemas can be loaded together:
+
+- `nis.ldif` and `rfc2307bis.ldif` (default);
+- `postfix-book.ldif` and `virtualMail.ldif`;
+- `msuser.ldif` is provided by OpenLDAP for reference only and cannot be loaded.
+
 ## eduperson
 
 Academic identity schema used in higher-education federations (students, staff, affiliations, scoped identifiers).

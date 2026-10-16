@@ -14,7 +14,7 @@ Guidance for coding agents working on `osixia/openldap` (v2), an OpenLDAP contai
 | `services/openldap-upgrade/` | Version check + restore-based migration on start. |
 | `services/openldap-pre-upgrade/` | Pre-upgrade backup, meant to run as an **init container on the N-1 image** (see below). |
 | `services/openldap-cron/` | `crond` running scheduled backups (as root, separate container). |
-| `build/` | Go CI/CD tool wrapping `osixia/container-baseimage/build` (dagger). Not part of the image. |
+| `build/` | Go CI/CD tool wrapping [osixia/dagger-build](https://github.com/osixia/dagger-build). Not part of the image. |
 | `docs/examples/` | Compose examples (quickstart, replication). |
 
 `.dockerignore` excludes `*.md`, `.gitkeep`, `build/`, `docs/`: none of them reach the image.
@@ -96,10 +96,11 @@ Adding a feature: create `services/openldap-bootstrap/assets/scripts/NN-feature.
 ## Build, test, CI
 
 - CI (`.github/workflows/go.yml`): golangci-lint + govulncheck on `build/`, ShellCheck on the repo, then the build pipeline (multi-arch build, tests, push, cosign signing + SBOM on tags).
+- Integration tests live in `build/tests/` (Go scenarios + bash checks in `testdata/`), see `build/README.md`. Add a scenario or a check there when adding a feature. Tested combinations: modules except `dyngroup.so` (conflicts with `dynlist.so`) and `mqtt.so` (conflicts with `lastbind.so`), schemas except `msuser.ldif` (not loadable) and `nis.ldif`/`virtualMail.ldif` (conflict with `rfc2307bis.ldif`/`postfix-book.ldif`, tested separately).
 - Local:
   ```bash
   shellcheck $(git ls-files '*.sh')
-  cd build && go mod vendor && go run main.go job test ../Dockerfile
+  cd build && go mod vendor && go run main.go job test ../Dockerfile --arches amd64
   docker build -t osixia/openldap:dev .
   docker run --rm -it osixia/openldap:dev --log-level debug   # --bash, --skip-process also useful
   ```
