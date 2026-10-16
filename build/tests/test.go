@@ -26,27 +26,12 @@ var scenarios = []scenario{
 	{"upgrade from previous releases", UpgradeFromPreviousReleases},
 }
 
-// Run checks OpenLDAP behavior after the reusable job's version check, only on the engine
-// platform: emulated images are slow and fail as Dagger services.
+// Run checks OpenLDAP behavior after the reusable job's version check. CI builds each arch
+// on a native runner: run locally with --arches matching the host to avoid emulation.
 func Run(ctx context.Context, client *dagger.Client, builds []*job.BuildResult) error {
 
-	enginePlatform, err := client.DefaultPlatform(ctx)
-	if err != nil {
-		return fmt.Errorf("engine platform: %w", err)
-	}
-
-	tested := 0
 	for _, build := range builds {
 		for _, image := range build.Containers {
-
-			platform, err := image.Platform(ctx)
-			if err != nil {
-				return fmt.Errorf("image platform: %w", err)
-			}
-			if platform != enginePlatform {
-				continue
-			}
-			tested++
 
 			for _, s := range scenarios {
 				log.Printf("scenario: %s ...", s.name)
@@ -59,10 +44,6 @@ func Run(ctx context.Context, client *dagger.Client, builds []*job.BuildResult) 
 				log.Printf("scenario: %s passed", s.name)
 			}
 		}
-	}
-
-	if tested == 0 && len(builds) > 0 {
-		return fmt.Errorf("no image built for the engine platform %v", enginePlatform)
 	}
 
 	return nil

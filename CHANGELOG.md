@@ -12,6 +12,7 @@ Project-specific changes only. See upstream [OpenLDAP release notes](https://www
 - Build the CI/CD tool with `osixia/dagger-build` (replaces `osixia/container-baseimage/build`) and Go 1.26.9.
 - Add integration tests: default bootstrap, all compatible modules and schemas, every bootstrap feature on a 3-node replicated cluster with TLS required, backup/restore and upgrades (simulated and from previous releases).
 - Harden the CI workflow: read-only default permissions, actions pinned by commit SHA, images only published from tags, Dependabot updates.
+- Build and test each architecture natively on its own runner instead of under QEMU, including the integration tests on arm64, and publish them together as a single multi-arch image.
 - Allow authenticated users to read `entry`, `objectClass`, `ou`, `o` and `dc` in addition to `cn`, `sn`, `givenName`, `mail` and `uid` in the default database ACL (new bootstraps only).
 - Set `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_CHECK_QUALITY` to `1` (was `0`) so `pwdMinLength` is enforced on clear text password changes; pre-hashed passwords are still accepted (new bootstraps only).
 - Fail bootstrap with an explicit error when `OPENLDAP_BOOTSTRAP_SUFFIX` does not start with `dc=`, instead of creating a root entry with an empty `dc`.

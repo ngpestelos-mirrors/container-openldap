@@ -13,10 +13,12 @@ go mod vendor
 go run main.go job test ../Dockerfile
 ```
 
-Limit a local run with `--arches amd64`.
+Limit a local run with `--arches amd64`. Pass the arch of the host: scenarios run on every
+built image, and other arches would be emulated. The CI builds and tests each arch on its
+own native runner, then publishes them together from their OCI archives
+(`--oci-export-to`, `--oci-import-from`).
 
-After the shared version check, `tests/` runs integration scenarios on the image built for
-the engine platform:
+After the shared version check, `tests/` runs integration scenarios on each built image:
 
 - default bootstrap;
 - alternative schemas (`nis`, `virtualMail`);
