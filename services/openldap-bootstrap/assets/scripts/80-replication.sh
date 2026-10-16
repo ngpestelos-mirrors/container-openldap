@@ -22,6 +22,12 @@ if [ "${OPENLDAP_BOOTSTRAP_REPLICATION}" = "true" ]; then
 
         source "/container/services/openldap-bootstrap/assets/scripts/helpers/password.sh"
 
+        # the password is a quoted olcSyncRepl credentials value, slapd does not support
+        # escaped double quotes in it
+        if [[ "${OPENLDAP_BOOTSTRAP_REPLICATION_DATA_READONLY_PASSWORD}" == *\"* ]]; then
+            container log fatal "OPENLDAP_BOOTSTRAP_REPLICATION_DATA_READONLY_PASSWORD must not contain double quotes"
+        fi
+
         # hosts
         current_fqdn="$(/bin/hostname -f)"
         current_host_id=0

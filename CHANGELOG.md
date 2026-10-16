@@ -28,6 +28,7 @@ Project-specific changes only. See upstream [OpenLDAP release notes](https://www
 - Remove bootstrap temporary files, including on failure.
 - Fix bootstrap failing with `Argument list too long` when the schemas listed in `OPENLDAP_BOOTSTRAP_SCHEMAS` exceed 128 KiB: schemas are now loaded with LDIF `include:` lines instead of being copied into an environment variable.
 - Fail bootstrap with an explicit error when a schema listed in `OPENLDAP_BOOTSTRAP_SCHEMAS` does not exist.
+- Fix replication bootstrap failing when `OPENLDAP_BOOTSTRAP_REPLICATION_DATA_READONLY_PASSWORD` contains spaces: the default `OPENLDAP_BOOTSTRAP_REPLICATION_DATA_SYNC_REPL_TEMPLATE` now quotes `credentials`. Passwords containing double quotes, which `olcSyncRepl` cannot store, are rejected with an explicit error.
 - Strip leading and trailing empty lines from every bootstrap LDIF fragment, including the first file of each prefix group.
 
 ### Documentation

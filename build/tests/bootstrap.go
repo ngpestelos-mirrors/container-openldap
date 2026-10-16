@@ -9,6 +9,10 @@ import (
 	"dagger.io/dagger"
 )
 
+// replicationPassword contains characters that must be quoted or escaped in olcSyncRepl,
+// double quotes are rejected.
+const replicationPassword = `Repl passw0rd 'single' \ $HOME`
+
 const defaultSchemas = "core.ldif cosine.ldif inetorgperson.ldif rfc2307bis.ldif"
 
 // allSchemas can be loaded together. Excluded:
@@ -127,7 +131,12 @@ func AllFeatures(ctx context.Context, client *dagger.Client, image *dagger.Conta
 
 		"OPENLDAP_BOOTSTRAP_REPLICATION":                        "true",
 		"OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS":                  strings.Join(hosts, " "),
-		"OPENLDAP_BOOTSTRAP_REPLICATION_DATA_READONLY_PASSWORD": password,
+		"OPENLDAP_BOOTSTRAP_REPLICATION_DATA_READONLY_PASSWORD": replicationPassword,
+	}
+
+	if _, err := expect(ctx, withEnv(image, merge(features, env{"OPENLDAP_BOOTSTRAP_REPLICATION_DATA_READONLY_PASSWORD": `pass"word`})), false,
+		[]string{"must not contain double quotes"}, "container", "--skip-process"); err != nil {
+		return fmt.Errorf("replication password with double quotes: %w", err)
 	}
 
 	services := make([]*dagger.Service, 0, len(nodes))
@@ -147,6 +156,8 @@ func AllFeatures(ctx context.Context, client *dagger.Client, image *dagger.Conta
 		"TEST_NODES":   strings.Join(nodes, " "),
 		"TEST_MODULES": strings.Join(allModules, " "),
 		"TEST_SCHEMAS": strings.Join(allSchemas, " "),
+
+		"TEST_REPLICATION_PASSWORD": replicationPassword,
 	}, fullCheck)
 }
 

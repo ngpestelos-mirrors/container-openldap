@@ -59,7 +59,7 @@ Runs only when both `OPENLDAP_CONF_DIR` and `OPENLDAP_DATA_DIR` are empty (hidde
 3. Files are sorted with `sort -V`, stripped of leading/trailing empty lines, and concatenated. **Prefix grouping by tens:** files in the same ten-group (`60-`…`69-`) are glued without a blank line (same LDIF entry, so they can add attributes to one entry); a group change inserts a blank line (new entry). Files without a numeric prefix are their own group.
 4. Result is loaded with `slapadd -n 0` (config) then `slapadd -n 1` (data). Use plain entries, never `changetype: modify`.
 
-Validation lives in the `env` phase and fails with `container log fatal`: `OPENLDAP_BOOTSTRAP_SUFFIX` must start with `dc=` (`00-base.sh`); replication needs 2 to 9 hosts and the current FQDN among them (`80-replication.sh`; syncrepl `rid` is built as `<current id><provider id>1`, so ids must stay single-digit).
+Validation lives in the `env` phase and fails with `container log fatal`: `OPENLDAP_BOOTSTRAP_SUFFIX` must start with `dc=` (`00-base.sh`); replication needs 2 to 9 hosts, the current FQDN among them and a replication password without `"` (`80-replication.sh`; syncrepl `rid` is built as `<current id><provider id>1`, so ids must stay single-digit).
 
 Adding a feature: create `services/openldap-bootstrap/assets/scripts/NN-feature.sh` guarded by `OPENLDAP_BOOTSTRAP_<FEATURE>`, source `helpers/common.sh` (and `helpers/password.sh`), call `check_args "$@"`, handle `env` and `ldif`; add templates under `ldif/config/<feature>/` and/or `ldif/data/<feature>/`; add defaults in `environment/.env.bootstrap`; document in `README.md`, `ldif/README.md` and `scripts/README.md`. Mind overlay order: `syncprov` must stay last (`180-…`).
 

@@ -135,6 +135,9 @@ for node in "${NODES[@]::${#NODES[@]}-1}"; do
 done
 ok "entries replicated from ${NODES[-1]} to the other nodes (multi-provider)"
 
+expect_rc 0 ldapsearch -LLL -x -H "${FIRST}" -D "cn=replicator,${TEST_SUFFIX}" -w "${TEST_REPLICATION_PASSWORD}" -b "${TEAM_DN}" -s base dn
+ok "replicator user can bind with a password containing spaces, single quotes, backslashes and \$"
+
 # password hashing
 expect_rc 0 bind_search "${FIRST}" "${ADMIN_DN}" -b "${ALICE_DN}" -s base userPassword
 expect_output "^userPassword:: $(printf '{ARGON2}' | base64 | cut -c1-10)"
