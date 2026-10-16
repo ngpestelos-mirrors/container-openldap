@@ -9,14 +9,18 @@ container log level eq trace && set -x
 CONFIG=false
 DATA=false
 CLEAN_DAYS=""
+CLEAN_PREFIX=""
 FILE_PREFIX=""
 
 usage() {
-    echo "Usage: openldap-ctl backup file-prefix [--config] [--data] [--clean days|--clean=days]"
+    echo "Usage: openldap-ctl backup file-prefix [--config] [--data] [--clean days|--clean=days] [--clean-prefix prefix|--clean-prefix=prefix]"
 }
 
+# remove backup files older than $1 days, only those starting with $2 if set
 clean() {
-    find "${OPENLDAP_BACKUP_DIR}" -type f -mtime "+$1" -exec rm -fv {} + | container log info
+    find "${OPENLDAP_BACKUP_DIR}" -mindepth 1 -maxdepth 1 -type f -mtime "+$1" \
+        \( -name "$2*${OPENLDAP_CTL_BACKUP_CONFIG_FILE_SUFFIX}" -o -name "$2*${OPENLDAP_CTL_BACKUP_DATA_FILE_SUFFIX}" \) \
+        -exec rm -fv {} + | container log info
 }
 
 backup_database() {
@@ -60,6 +64,18 @@ while [ $# -gt 0 ]; do
           CLEAN_DAYS="${1#*=}"
           shift
           ;;
+      --clean-prefix)
+          if [ $# -lt 2 ]; then
+              usage
+              container log fatal "Missing value for --clean-prefix"
+          fi
+          CLEAN_PREFIX="$2"
+          shift 2
+          ;;
+      --clean-prefix=*)
+          CLEAN_PREFIX="${1#*=}"
+          shift
+          ;;
       --*)
           usage
           container log fatal "Unknown option: $1"
@@ -86,6 +102,16 @@ if [ -n "${CLEAN_DAYS}" ] && [[ ! "${CLEAN_DAYS}" =~ ^[0-9]+$ ]]; then
     container log fatal "--clean must be a non-negative number of days"
 fi
 
+if [ -n "${CLEAN_PREFIX}" ] && [ -z "${CLEAN_DAYS}" ]; then
+    usage
+    container log fatal "--clean-prefix requires --clean"
+fi
+
+if [[ "${CLEAN_PREFIX}" == *[\*\?\[/]* ]]; then
+    usage
+    container log fatal "--clean-prefix must not contain *, ?, [ or /"
+fi
+
 if [ "${CONFIG}" = false ] && [ "${DATA}" = false ]; then
     CONFIG=true
     DATA=true
@@ -102,6 +128,6 @@ if [ "${DATA}" = true ]; then
 fi
 
 if [ -n "${CLEAN_DAYS}" ]; then
-    container log info "Cleaning up backups older than ${CLEAN_DAYS} day(s) ..."
-    clean "${CLEAN_DAYS}"
+    container log info "Cleaning up backups${CLEAN_PREFIX:+ starting with ${CLEAN_PREFIX}} older than ${CLEAN_DAYS} day(s) ..."
+    clean "${CLEAN_DAYS}" "${CLEAN_PREFIX}"
 fi

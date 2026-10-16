@@ -106,6 +106,10 @@ func BackupRestore(ctx context.Context, client *dagger.Client, image *dagger.Con
 		return err
 	}
 
+	if err := clean(ctx, image, v); err != nil {
+		return err
+	}
+
 	// restore into empty config and data directories
 	restored := emptyVolumes(client)
 	restored.backup = v.backup
@@ -282,3 +286,61 @@ func UpgradeFromPreviousReleases(ctx context.Context, client *dagger.Client, ima
 
 //go:embed testdata/served.sh
 var servedCheck string
+
+// clean checks openldap-ctl backup --clean only removes old backup files, starting with
+// --clean-prefix if set.
+func clean(ctx context.Context, image *dagger.Container, v volumes) error {
+
+	old := []string{
+		"openldap-cron-old-config.gz", "openldap-cron-old-data.gz",
+		"manual-old-config.gz", "manual-old-data.gz",
+		"openldap-upgrade-2.6-config.gz", "other-old-file.txt",
+	}
+
+	aged := withVolumes(image, v)
+	for _, f := range old {
+		aged = aged.WithExec([]string{"touch", "-d", "2000-01-01", backupDir + "/" + f})
+	}
+
+	ls := func(c *dagger.Container) (string, error) {
+		r, err := expect(ctx, c, true, nil, "ls", backupDir)
+		if err != nil {
+			return "", err
+		}
+		return r.output, nil
+	}
+
+	r, err := expect(ctx, aged, true, nil, "container", "run", "--", "openldap-ctl", "backup", "openldap-cron-new", "--clean", "1", "--clean-prefix", "openldap-cron-")
+	if err != nil {
+		return err
+	}
+	files, err := ls(r.container)
+	if err != nil {
+		return err
+	}
+	for _, f := range []string{"openldap-cron-new-config.gz", "manual-old-config.gz", "openldap-upgrade-2.6-config.gz", "other-old-file.txt", "test-backup-config.gz"} {
+		if !strings.Contains(files, f) {
+			return fmt.Errorf("--clean-prefix removed %s:\n%s", f, files)
+		}
+	}
+	if strings.Contains(files, "openldap-cron-old-") {
+		return fmt.Errorf("--clean-prefix did not remove old cron backups:\n%s", files)
+	}
+
+	r, err = expect(ctx, r.container, true, nil, "container", "run", "--", "openldap-ctl", "backup", "manual-new", "--clean", "1")
+	if err != nil {
+		return err
+	}
+	files, err = ls(r.container)
+	if err != nil {
+		return err
+	}
+	if strings.Contains(files, "manual-old-") || strings.Contains(files, "openldap-upgrade-2.6-") {
+		return fmt.Errorf("--clean did not remove old backups:\n%s", files)
+	}
+	if !strings.Contains(files, "other-old-file.txt") || !strings.Contains(files, "test-backup-config.gz") {
+		return fmt.Errorf("--clean removed a file that is not an old backup:\n%s", files)
+	}
+
+	return nil
+}

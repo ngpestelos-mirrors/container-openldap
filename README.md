@@ -130,11 +130,13 @@ Create a full backup:
 docker exec openldap container run -- openldap-ctl backup my-backup
 ```
 
-Create only a data backup and remove files older than 15 days:
+Create only a data backup and remove backups older than 15 days whose name starts with `my-`:
 
 ```bash
-docker exec openldap container run -- openldap-ctl backup my-backup --data --clean 15
+docker exec openldap container run -- openldap-ctl backup my-backup --data --clean 15 --clean-prefix my-
 ```
+
+Without `--clean-prefix`, `--clean` removes all old backups in `OPENLDAP_BACKUP_DIR`. Other files are never removed.
 
 This creates files in `OPENLDAP_BACKUP_DIR`:
 
@@ -442,7 +444,7 @@ docker run --rm --user $UID -v $(pwd)/schema:/data   \
 | `OPENLDAP_CTL_PASSWORD_GENERATE_CMD`     | Command used by `openldap-ctl password generate`            | `slappasswd -n -g; slappasswd -g`                                                                                                                                                |
 | `OPENLDAP_CTL_PASSWORD_HASH_CMD`         | Command used by `openldap-ctl password hash`                | `slappasswd -h {ARGON2} -o module-path=${OPENLDAP_MODULES_DIR} -o module-load=argon2`                                                                                            |
 | `OPENLDAP_CTL_SCHEMA2LDIF_DEPENDENCIES`  | Default schema dependencies for `schema2ldif`               | `core.schema cosine.schema inetorgperson.schema`                                                                                                                                 |
-| `OPENLDAP_CRON_JOB`                      | Cron job used by the backup service                         | `15 2 * * * PATH=${PATH} container run -- openldap-ctl backup "$(date -I)-${OPENLDAP_VERSION}-openldap-cron" --clean 15` |
+| `OPENLDAP_CRON_JOB`                      | Cron job used by the backup service                         | `15 2 * * * PATH=${PATH} container run -- openldap-ctl backup "openldap-cron-$(date -I)-${OPENLDAP_VERSION}" --clean 15 --clean-prefix openldap-cron-` |
 | `OPENLDAP_UPGRADE_FORCE`                 | Allow upgrade bypasses, including forced downgrade handling | `false`                                                                                                                                                                          |
 | `OPENLDAP_UPGRADE_MIGRATION_LEVEL`       | Allowed migration level                                     | `minor`                                                                                                                                                                          |
 | `OPENLDAP_UPGRADE_BACKUP_FILES_PREFIX`   | Prefix for upgrade backup files                             | `openldap-upgrade`                                                                                                                                                               |
