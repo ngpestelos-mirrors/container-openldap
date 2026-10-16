@@ -10,7 +10,13 @@ CONFIG=false
 DATA=false
 FORCE=false
 RESTART=false
+RESTORED=false
 FILE_PREFIX=""
+
+# existing config and data are moved to this hidden directory, in the same volume, until
+# the restore succeeds
+PREVIOUS_DIR_NAME=".restore-previous"
+STASHED_DIRS=()
 
 usage() {
     echo "Usage: openldap-ctl restore file-prefix [--config] [--data] [--force]"
@@ -40,6 +46,50 @@ restore_database() {
 
     if [ "${db_number}" -gt 0 ]; then
         slapindex -F "${OPENLDAP_CONF_DIR}" -n "${db_number}" 2>&1 | container log debug
+    fi
+}
+
+# move the content of a directory to its previous directory
+stash() {
+    local dir="$1"
+    local previous_dir="${dir}/${PREVIOUS_DIR_NAME}"
+
+    container log info "Moving existing data in ${dir} to ${previous_dir} ..."
+    mkdir "${previous_dir}"
+    STASHED_DIRS+=("${dir}")
+
+    find "${dir}" -mindepth 1 -maxdepth 1 ! -name "lost+found" ! -name ".*" \
+        -exec mv -v {} "${previous_dir}/" \; 2>&1 | container log debug
+}
+
+# replace the content of a directory by its previous directory content
+unstash() {
+    local dir="$1"
+    local previous_dir="${dir}/${PREVIOUS_DIR_NAME}"
+
+    container log warning "Restoring previous data in ${dir} ..."
+
+    find "${dir}" -mindepth 1 -maxdepth 1 ! -name "lost+found" ! -name ".*" -exec rm -fr {} +
+    find "${previous_dir}" -mindepth 1 -maxdepth 1 -exec mv -v {} "${dir}/" \; 2>&1 | container log debug
+    rmdir "${previous_dir}"
+}
+
+finish() {
+    local dir
+
+    if [ "${RESTORED}" = true ]; then
+        for dir in "${STASHED_DIRS[@]}"; do
+            rm -fr "${dir:?}/${PREVIOUS_DIR_NAME}"
+        done
+    elif [ "${#STASHED_DIRS[@]}" -gt 0 ]; then
+        container log error "Restore failed, rolling back to the previous data ..."
+        for dir in "${STASHED_DIRS[@]}"; do
+            unstash "${dir}"
+        done
+    fi
+
+    if [ "${RESTART}" = true ]; then
+        container processes start openldap
     fi
 }
 
@@ -94,6 +144,12 @@ if [ "${DATA}" = true ]; then
     check_backup_file "${DATA_BACKUP_FILE}"
 fi
 
+for dir in "${OPENLDAP_CONF_DIR}" "${OPENLDAP_DATA_DIR}"; do
+    if [ -e "${dir}/${PREVIOUS_DIR_NAME}" ]; then
+        container log fatal "${dir}/${PREVIOUS_DIR_NAME} exists: a previous restore was interrupted. Check the data, then move its content back to ${dir} or delete it."
+    fi
+done
+
 if [ -e "/run/container/processes/openldap.pid" ]; then
 
     if [ "${FORCE}" != true ]; then
@@ -115,28 +171,20 @@ if [ -n "$(find "${OPENLDAP_CONF_DIR}" -mindepth 1 -maxdepth 1 ! -name "lost+fou
 
 fi
 
-if [ "${CONFIG}" = true ]; then
+trap finish EXIT
 
-    if [ -n "$(find "${OPENLDAP_CONF_DIR}" -mindepth 1 -maxdepth 1 ! -name "lost+found" ! -name ".*")" ]; then
-        container log warning "Deleting data in ${OPENLDAP_CONF_DIR} ..."
-        rm -fr "${OPENLDAP_CONF_DIR:?}"/*
-    fi
+if [ "${CONFIG}" = true ]; then
+    stash "${OPENLDAP_CONF_DIR}"
 
     container log info "Restoring OpenLDAP config ..."
     restore_database "${CONFIG_BACKUP_FILE}" 0
 fi
 
 if [ "${DATA}" = true ]; then
-
-    if [ -n "$(find "${OPENLDAP_DATA_DIR}" -mindepth 1 -maxdepth 1 ! -name "lost+found" ! -name ".*")" ]; then
-        container log warning "Deleting data in ${OPENLDAP_DATA_DIR} ..."
-        rm -fr "${OPENLDAP_DATA_DIR:?}"/*
-    fi
+    stash "${OPENLDAP_DATA_DIR}"
 
     container log info "Restoring OpenLDAP data ..."
     restore_database "${DATA_BACKUP_FILE}" 1
 fi
 
-if [ "${RESTART}" = true ]; then
-    container processes start openldap
-fi
+RESTORED=true

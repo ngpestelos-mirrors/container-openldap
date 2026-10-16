@@ -17,6 +17,7 @@ Project-specific changes only. See upstream [OpenLDAP release notes](https://www
 - Fail bootstrap with an explicit error when `OPENLDAP_BOOTSTRAP_SUFFIX` does not start with `dc=`, instead of creating a root entry with an empty `dc`.
 - Fail bootstrap with an explicit error when `OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS` contains more than 9 hosts.
 - Check that backup files exist and are valid gzip archives before `openldap-ctl restore` stops OpenLDAP or deletes existing data.
+- Roll back to the previous config and data, and restart OpenLDAP if it was running, when `openldap-ctl restore` fails. Existing data is moved to a hidden `.restore-previous` directory in the same volume until the restore succeeds.
 - Print usage when `openldap-ctl schema2ldif` is called without arguments.
 - `openldap-ctl backup --clean` only removes backup files, and the new `--clean-prefix` option limits it to backups starting with a prefix. Cron backups are now named `openldap-cron-<date>-<version>` and only clean these files, manual and upgrade backups are kept. Cron backups named with the previous format are no longer removed automatically.
 

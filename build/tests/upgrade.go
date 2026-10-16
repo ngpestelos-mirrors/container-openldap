@@ -149,6 +149,29 @@ func BackupRestore(ctx context.Context, client *dagger.Client, image *dagger.Con
 		return fmt.Errorf("data after the restore of a corrupted backup: %w", err)
 	}
 
+	// a backup that fails to load is rolled back to the previous data
+	invalid := withVolumes(image, v).
+		WithExec([]string{"cp", backupDir + "/test-backup-config.gz", backupDir + "/invalid-config.gz"}).
+		WithExec([]string{"sh", "-c", "printf 'dn: not a valid entry\\nfoo\\n' | gzip > " + backupDir + "/invalid-data.gz"})
+
+	r, err = expect(ctx, invalid, false, []string{"Restore failed, rolling back to the previous data"}, "container", "run", "--", "openldap-ctl", "restore", "invalid", "--force")
+	if err != nil {
+		return fmt.Errorf("restore of an invalid backup: %w", err)
+	}
+	rolledBack := readVolumes(r.container)
+	if err := expectPeople(ctx, image, rolledBack); err != nil {
+		return fmt.Errorf("data after the rollback: %w", err)
+	}
+	if _, err := expect(ctx, withVolumes(image, rolledBack), false, nil, "ls", "-d", confDir+"/.restore-previous", dataDir+"/.restore-previous"); err != nil {
+		return fmt.Errorf("previous data directories after the rollback: %w", err)
+	}
+
+	// an interrupted restore is detected
+	interrupted := withVolumes(image, v).WithExec([]string{"mkdir", dataDir + "/.restore-previous"})
+	if _, err := expect(ctx, interrupted, false, []string{"a previous restore was interrupted"}, "container", "run", "--", "openldap-ctl", "restore", "test-backup", "--force"); err != nil {
+		return fmt.Errorf("restore after an interrupted restore: %w", err)
+	}
+
 	return nil
 }
 

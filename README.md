@@ -149,7 +149,7 @@ Restore a backup:
 docker exec openldap container run -- openldap-ctl restore my-backup --force
 ```
 
-`--force` stops the OpenLDAP process if needed, deletes existing data in the target directories, restores the selected databases, then starts OpenLDAP again. Backup files are checked first: if one is missing or corrupted, nothing is stopped or deleted.
+`--force` stops the OpenLDAP process if needed, replaces existing data in the target directories with the selected databases, then starts OpenLDAP again. Backup files are checked first: if one is missing or corrupted, nothing is stopped or deleted. If the restore fails, the previous data is put back.
 
 The cron service is disabled by default. To schedule regular backups, run it in a separate container alongside OpenLDAP, sharing its configuration, data, and backup volumes:
 

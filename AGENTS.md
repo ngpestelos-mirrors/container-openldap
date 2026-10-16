@@ -68,7 +68,7 @@ Adding a feature: create `services/openldap-bootstrap/assets/scripts/NN-feature.
 `/usr/bin/openldap-ctl` → `services/openldap/assets/openldap-ctl/openldap-ctl.sh`, which dispatches to `command/<name>.sh` (adding a file there adds a command).
 
 - `backup <prefix> [--config] [--data] [--clean N] [--clean-prefix P]`: `slapcat | gzip` into `OPENLDAP_BACKUP_DIR`, written to a temp file then moved (atomic), umask 077. `--clean` only removes backup files (`*-config.gz`, `*-data.gz`) older than N days, starting with P if set; the cron uses `openldap-cron-` so manual and upgrade backups are kept.
-- `restore <prefix> [--config] [--data] [--force]`: first checks the backup files exist and are valid gzip (before stopping or deleting anything), then refuses if slapd runs or dirs are not empty unless `--force` (stops/restarts slapd, wipes dirs).
+- `restore <prefix> [--config] [--data] [--force]`: first checks the backup files exist and are valid gzip (before stopping or deleting anything), then refuses if slapd runs or dirs are not empty unless `--force` (stops/restarts slapd). Existing data is moved to `<dir>/.restore-previous` (same volume) and put back if the restore fails; a leftover `.restore-previous` (interrupted restore) blocks the next restore.
 - `password generate|hash`, `schema2ldif <file.schema> [deps]`.
 
 ## Coding conventions
